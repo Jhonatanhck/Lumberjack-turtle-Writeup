@@ -1,134 +1,133 @@
 
-Reconocimiento
+Aquí tienes tu writeup formateado en Markdown listo para copiar y pegar en GitHub (como en un archivo README.md).
 
-![[Pasted image 20260111191529.png]]
-Obtenemos esto del reconocimiento de nmap, voy a enumerar la pagina web
+He realizado los siguientes cambios para asegurarme de que funcione perfecto:
 
-![[Pasted image 20260111191601.png]]
-tenemos esto, nos dice que busquemos mas profundo asi que voy a utilizar la herramienta gobuster para buscar mas directorios
+    Formato de imágenes: He cambiado ![[imagen.png]] por ![Descripcion](images/imagen.png).
 
-![[Pasted image 20260111194350.png]]
-estos fueron los directorios que encontro
+    Espacios en nombres: He reemplazado los espacios en los nombres de archivo por %20 (ejemplo: Pasted%20image...), ya que GitHub a veces falla si dejas espacios en blanco en las rutas de las imágenes.
 
-![[Pasted image 20260111191818.png]]
-cuando entro me aparece esta pagina de error, el error parece ser de java, por lo que esta corriendo java por detras
+    Estructura: He añadido algunos títulos para separar las fases (Reconocimiento, Explotación, Escalada).
 
-![[Pasted image 20260111194436.png]]
-en el otro directorio tenemos esto asi que hare otro reconocimiento 
+Solo asegúrate de que tu estructura de carpetas en GitHub sea así:
+Plaintext
 
-![[Pasted image 20260111194548.png]]
-y aqui encontramos este directorio que parece una pista de lo que tenemos que hacer ya sabemos que corre java, y ahora tenemos el nombre de una vulnerabilidad web de java
+/ (directorio raíz del repo)
+├── README.md  (o el nombre de tu archivo)
+└── images/    (carpeta con todas las fotos)
 
-![[Pasted image 20260111194535.png]]
-dentro del directorio nos encontramos esto 
+Aquí tienes el código:
+Markdown
 
-![[Pasted image 20260111194752.png]]
-para probar la vulnerabilidad estare usando este payload
+# Writeup: Lumberjack Turtle
 
-![[Pasted image 20260111194932.png]]
-![[Pasted image 20260111194944.png]]
-en la cabecera accept nos mando una senal al netcat asi que es vulnerable 
+## Reconocimiento
 
-para obtener una shell encontre este recurso https://github.com/christophetd/log4shell-vulnerable-app/blob/main/README.md
+Obtenemos esto del reconocimiento de nmap, voy a enumerar la página web:
 
-![[Pasted image 20260111203530.png]]
-lo primero que tenemos que hacer es ejecutar el script para crear un servidor ldap
+![Resultado Nmap](images/Pasted%20image%2020260111191529.png)
 
-![[Pasted image 20260111203556.png]]
-luego preparar nuestro listener
+Al entrar tenemos esto, nos dice que busquemos más profundo, así que voy a utilizar la herramienta gobuster para buscar más directorios:
 
-![[Pasted image 20260111203613.png]]
-ahora ejecutar este payload con una reverse shell en base64 en el campo vulnerable
+![Pagina Web](images/Pasted%20image%2020260111191601.png)
 
-Le damos a send
+Estos fueron los directorios que encontró:
 
-![[Pasted image 20260111203725.png]]
-y ya tenemos una shell 
+![Gobuster Scan](images/Pasted%20image%2020260111194350.png)
 
-al parecer estamos dentro de un contenedor, asi que debemos salir de el para vulnerar la maquina
+Cuando entro me aparece esta página de error. El error parece ser de Java, por lo que está corriendo Java por detrás:
 
+![Error Java](images/Pasted%20image%2020260111191818.png)
 
-![[Pasted image 20260111204712.png]]
-enumerando con linpeas encontre estos dos binaros interesantes con el que podemos montarnos el disco duro de la maquina donde corre el docker
+En el otro directorio tenemos esto, así que haré otro reconocimiento:
 
-![[Pasted image 20260111210025.png]]
-encontramos la primera flag en este directorio
+![Directorio Logs](images/Pasted%20image%2020260111194436.png)
 
-![[Pasted image 20260111210101.png]]
-como somos root podemos ver el disco duro de la maquina host y como tenemos permisos para montarlo con el binario mount nos podemos aprovechar de eso para escalar privilegios 
+Y aquí encontramos este directorio que parece una pista de lo que tenemos que hacer. Ya sabemos que corre Java, y ahora tenemos el nombre de una vulnerabilidad web de Java:
 
+![Pista Log4j](images/Pasted%20image%2020260111194548.png)
 
-![[Pasted image 20260111210223.png]]
-primero creamos una carpeta para montar el disco duro ahi
+Dentro del directorio nos encontramos esto:
 
-![[Pasted image 20260111210257.png]]
-montamos el disco duro en el directorio que acabamos de crear
+![Pagina Log4j](images/Pasted%20image%2020260111194535.png)
 
-![[Pasted image 20260111210332.png]]
-y aqui tenemos toda la raiz de la maquina host
-ya tenemos la maquina, ahora como escapamos?
+## Explotación (Log4Shell)
 
-lo primero es que nos tenemos que crear dos pares de llaves con ssh-keygen -t rsa
+Para probar la vulnerabilidad estaré usando este payload:
 
-![[Pasted image 20260111210953.png]]
-ahora nos copiamos esto 
+![Payload Test](images/Pasted%20image%2020260111194752.png)
 
-![[Pasted image 20260111211322.png]]
-y lo tenemos que meter en la authorized_keys de la maquina victima
+En la cabecera `Accept` nos mandó una señal al netcat, así que es vulnerable:
 
-![[Pasted image 20260111211450.png]]
-y ahora solo nos conectamos y ya estamos en la maquina victima, PWNED
+![Netcat Connection](images/Pasted%20image%2020260111194932.png)
+![Burp Response](images/Pasted%20image%2020260111194944.png)
 
-![[Pasted image 20260111211548.png]]
-y aqui tenemos la segunda flag 
+Para obtener una shell encontré este recurso: [Log4Shell Vulnerable App](https://github.com/christophetd/log4shell-vulnerable-app/blob/main/README.md)
 
-# Que aprendi
+Lo primero que tenemos que hacer es ejecutar el script para crear un servidor LDAP:
 
-### 1. Explotación de Log4Shell (CVE-2021-44228)
+![JNDI Server](images/Pasted%20image%2020260111203530.png)
 
-- **Vector de ataque en Headers:** Aprendiste que las vulnerabilidades no siempre están en los campos de entrada visibles (inputs de login), sino que pueden estar en cabeceras HTTP "invisibles" como `User-Agent` o `X-Api-Version`.
-    
-- **Inyección JNDI:** Entendiste cómo funciona el protocolo LDAP para engañar al servidor. No ejecutaste el código directamente; obligaste al servidor a conectarse a ti (`jndi:ldap://`) para descargar y ejecutar la clase maliciosa.
-    
-- **Evasión/Bypass:** Viste que a veces hay que modificar el payload (codificación Base64 en el comando) para que funcione.
-    
+Luego preparar nuestro listener:
 
-### 2. "Dependency Hell" y Troubleshooting (Resolución de problemas)
+![Netcat Listener](images/Pasted%20image%2020260111203556.png)
 
-- Esto fue clave en tu proceso. Aprendiste que **las herramientas de hacking envejecen**.
-    
-- Te enfrentaste a un error de Java (`IllegalAccessError`) porque `JNDIExploit` requería Java 8 y tu sistema tenía una versión moderna.
-    
-- **Lección vital:** Un hacker no se rinde cuando la herramienta falla; busca la dependencia correcta (descargar el JDK 8 portátil) y adapta su entorno.
-    
+Ahora ejecutar este payload con una reverse shell en base64 en el campo vulnerable. Le damos a send:
 
-### 3. Enumeración de Contenedores (Docker Enumeration)
+![Burp Exploit](images/Pasted%20image%2020260111203613.png)
 
-- Aprendiste a identificar que estabas en un contenedor (probablemente por el hostname extraño o archivos como `.dockerenv`).
-    
-- **La clave:** El comando `fdisk -l`. Aprendiste que ver particiones del sistema host (como `/dev/nvme0n1` o `/dev/sda1`) desde dentro de un contenedor es una anomalía crítica.
-    
+Y ya tenemos una shell:
 
-### 4. Docker Breakout (Escapar del contenedor)
+![Reverse Shell](images/Pasted%20image%2020260111203725.png)
 
-Esta es la joya de la corona de esta máquina.
+## Post-Explotación & Docker Breakout
 
-- **Privileged Containers:** Explotaste un contenedor configurado con el flag `--privileged`. Esto otorga al contenedor acceso a los dispositivos del host.
-    
-- **Montaje de discos:** Aprendiste que si puedes ver el disco, puedes montarlo (`mount /dev/sda1 /mnt`).
-    
-- **Concepto:** El sistema de archivos del host se vuelve simplemente una carpeta más para ti.
-    
+Al parecer estamos dentro de un contenedor, así que debemos salir de él para vulnerar la máquina.
 
-### 5. Manipulación de SSH (Persistencia/Escalada)
+Enumerando con `linpeas` encontré estos dos binarios interesantes con el que podemos montarnos el disco duro de la máquina donde corre el docker:
 
-- En lugar de intentar crackear hashes de contraseñas (que podría tardar años), utilizaste una técnica de **abuso de confianza**.
-    
-- Al tener escritura en el disco montado, inyectaste tu propia **llave pública** en `authorized_keys`.
-    
-- Esto te enseñó cómo convertir un acceso de archivos (File Write) en una ejecución de comandos (RCE/Shell) como root.
+![Linpeas Fdisk](images/Pasted%20image%2020260111204712.png)
 
+Encontramos la primera flag en este directorio:
 
+![User Flag Location](images/Pasted%20image%2020260111210025.png)
+![User Flag](images/Pasted%20image%2020260111210101.png)
+
+Como somos root podemos ver el disco duro de la máquina host y como tenemos permisos para montarlo con el binario `mount` nos podemos aprovechar de eso para escalar privilegios.
+
+Primero creamos una carpeta para montar el disco duro ahí:
+
+![Mkdir](images/Pasted%20image%2020260111210223.png)
+
+Montamos el disco duro en el directorio que acabamos de crear:
+
+![Mount Command](images/Pasted%20image%2020260111210257.png)
+
+Y aquí tenemos toda la raíz de la máquina host:
+
+![Host Root](images/Pasted%20image%2020260111210332.png)
+
+### Escalada de Privilegios (SSH Injection)
+
+Ya tenemos la máquina, ahora ¿cómo escapamos?
+
+Lo primero es que nos tenemos que crear dos pares de llaves con `ssh-keygen -t rsa`:
+
+![SSH Keygen](images/Pasted%20image%2020260111210953.png)
+
+Ahora nos copiamos esto:
+
+![Copy Pub Key](images/Pasted%20image%2020260111211322.png)
+
+Y lo tenemos que meter en el archivo `authorized_keys` de la máquina víctima (accesible a través del disco montado):
+
+![Echo Key](images/Pasted%20image%2020260111211450.png)
+
+Y ahora solo nos conectamos y ya estamos en la máquina víctima. **PWNED**:
+
+![SSH Login](images/Pasted%20image%2020260111211548.png)
+
+Y aquí tenemos la segunda flag.
 
 
 
