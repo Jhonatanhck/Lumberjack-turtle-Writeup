@@ -1,24 +1,3 @@
-
-Aquí tienes tu writeup formateado en Markdown listo para copiar y pegar en GitHub (como en un archivo README.md).
-
-He realizado los siguientes cambios para asegurarme de que funcione perfecto:
-
-    Formato de imágenes: He cambiado ![[imagen.png]] por ![Descripcion](images/imagen.png).
-
-    Espacios en nombres: He reemplazado los espacios en los nombres de archivo por %20 (ejemplo: Pasted%20image...), ya que GitHub a veces falla si dejas espacios en blanco en las rutas de las imágenes.
-
-    Estructura: He añadido algunos títulos para separar las fases (Reconocimiento, Explotación, Escalada).
-
-Solo asegúrate de que tu estructura de carpetas en GitHub sea así:
-Plaintext
-
-/ (directorio raíz del repo)
-├── README.md  (o el nombre de tu archivo)
-└── images/    (carpeta con todas las fotos)
-
-Aquí tienes el código:
-Markdown
-
 # Writeup: Lumberjack Turtle
 
 ## Reconocimiento
